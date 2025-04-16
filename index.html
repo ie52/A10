@@ -1,58 +1,33 @@
-package com.example;
+function setCookie(cname, cvalue, exdays) {
+  const d = new Date();
+  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
+  let expires = "expires="+d.toUTCString();
+  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
+}
 
-import javax.servlet.annotation.WebServlet;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import java.io.IOException;
-
-@WebServlet("/")
-public class CookieServlet extends HttpServlet {
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
-        
-        // Check if cookie exists
-        String cookieValue = null;
-        Cookie[] cookies = request.getCookies();
-        
-        if (cookies != null) {
-            for (Cookie cookie: cookies) {
-                if ("user".equals(cookie.getName())) {
-                    cookieValue = cookie.getValue();
-                    break;
-                }
-            }
-        }
-
-        // Simple HTML page with cookie info and a button
-        response.setContentType("text/html");
-        response.getWriter().println("<html>");
-        response.getWriter().println("<head><title>Cookie Demo</title></head>");
-        response.getWriter().println("<body style='text-align: center; margin-top: 50px;'>");
-        response.getWriter().println("<h2>Cookie Demo</h2>");
-        
-        if (cookieValue != null) {
-            response.getWriter().println("<p>Cookie value: " + cookieValue + "</p>");
-        } else {
-            response.getWriter().println("<p>No cookie found</p>");
-        }
-        
-        response.getWriter().println("<form method='post'>");
-        response.getWriter().println("<input type='submit' value='Set Cookie'>");
-        response.getWriter().println("</form>");
-        response.getWriter().println("</body></html>");
+function getCookie(cname) {
+  let name = cname + "=";
+  let ca = document.cookie.split(';');
+  for(let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) == ' ') {
+      c = c.substring(1);
     }
-
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws IOException {
-        
-        // Create a cookie that lasts for 1 day
-        Cookie cookie = new Cookie("user", "testUser");
-        cookie.setMaxAge(24 * 60 * 60);
-        response.addCookie(cookie);
-        
-        // Redirect back to the main page
-        response.sendRedirect(request.getContextPath() + "/");
+    if (c.indexOf(name) == 0) {
+      return c.substring(name.length, c.length);
     }
+  }
+  return "";
+}
+
+function checkCookie() {
+  let user = getCookie("username");
+  if (user != "") {
+    alert("Welcome again " + user);
+  } else {
+    user = prompt("Please enter your name:", "");
+    if (user != "" && user != null) {
+      setCookie("username", user, 365);
+    }
+  }
 }
