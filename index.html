@@ -1,6 +1,5 @@
 package com.example;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServlet;
@@ -8,48 +7,52 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet("/cookie")
+@WebServlet("/")
 public class CookieServlet extends HttpServlet {
-    @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
+            throws IOException {
         
+        // Check if cookie exists
+        String cookieValue = null;
         Cookie[] cookies = request.getCookies();
-        String username = null;
         
         if (cookies != null) {
-            for (Cookie cookie : cookies) {
-                if ("username".equals(cookie.getName())) {
-                    username = cookie.getValue();
+            for (Cookie cookie: cookies) {
+                if ("user".equals(cookie.getName())) {
+                    cookieValue = cookie.getValue();
                     break;
                 }
             }
         }
 
+        // Simple HTML page with cookie info and a button
         response.setContentType("text/html");
-        response.getWriter().println("<html><body>");
+        response.getWriter().println("<html>");
+        response.getWriter().println("<head><title>Cookie Demo</title></head>");
+        response.getWriter().println("<body style='text-align: center; margin-top: 50px;'>");
         response.getWriter().println("<h2>Cookie Demo</h2>");
         
-        if (username != null) {
-            response.getWriter().println("<p>Cookie value: " + username + "</p>");
+        if (cookieValue != null) {
+            response.getWriter().println("<p>Cookie value: " + cookieValue + "</p>");
         } else {
             response.getWriter().println("<p>No cookie found</p>");
         }
         
-        response.getWriter().println("<form action='cookie' method='post'>");
-        response.getWriter().println("<input type='submit' value='Create Cookie'>");
+        response.getWriter().println("<form method='post'>");
+        response.getWriter().println("<input type='submit' value='Set Cookie'>");
         response.getWriter().println("</form>");
         response.getWriter().println("</body></html>");
     }
 
-    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) 
-            throws ServletException, IOException {
+            throws IOException {
         
-        Cookie cookie = new Cookie("username", "John Doe");
-        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+        // Create a cookie that lasts for 1 day
+        Cookie cookie = new Cookie("user", "testUser");
+        cookie.setMaxAge(24 * 60 * 60);
         response.addCookie(cookie);
         
-        response.sendRedirect("cookie");
+        // Redirect back to the main page
+        response.sendRedirect(request.getContextPath() + "/");
     }
 }
