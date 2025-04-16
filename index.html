@@ -1,33 +1,102 @@
-function setCookie(cname, cvalue, exdays) {
-  const d = new Date();
-  d.setTime(d.getTime() + (exdays * 24 * 60 * 60 * 1000));
-  let expires = "expires="+d.toUTCString();
-  document.cookie = cname + "=" + cvalue + ";" + expires + ";path=/";
-}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Name Cookie Demo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin-top: 50px;
+            background-color: #f0f0f0;
+        }
+        .popup {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.3);
+        }
+        button {
+            padding: 8px 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div id="welcome"></div>
+    <div id="namePopup" class="popup">
+        <h3>Please enter your name:</h3>
+        <input type="text" id="nameInput">
+        <br>
+        <button onclick="saveName()">Submit</button>
+    </div>
+    <button onclick="clearCookie()" id="clearButton" style="display: none;">Clear Cookie</button>
 
-function getCookie(cname) {
-  let name = cname + "=";
-  let ca = document.cookie.split(';');
-  for(let i = 0; i < ca.length; i++) {
-    let c = ca[i];
-    while (c.charAt(0) == ' ') {
-      c = c.substring(1);
-    }
-    if (c.indexOf(name) == 0) {
-      return c.substring(name.length, c.length);
-    }
-  }
-  return "";
-}
+    <script>
+        function setCookie(name, value, days) {
+            const date = new Date();
+            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+            document.cookie = name + "=" + value + ";expires=" + date.toUTCString() + ";path=/";
+        }
 
-function checkCookie() {
-  let user = getCookie("username");
-  if (user != "") {
-    alert("Welcome again " + user);
-  } else {
-    user = prompt("Please enter your name:", "");
-    if (user != "" && user != null) {
-      setCookie("username", user, 365);
-    }
-  }
-}
+        function getCookie(name) {
+            const cookieName = name + "=";
+            const cookies = document.cookie.split(';');
+            for(let cookie of cookies) {
+                cookie = cookie.trim();
+                if (cookie.startsWith(cookieName)) {
+                    return cookie.substring(cookieName.length);
+                }
+            }
+            return "";
+        }
+
+        function saveName() {
+            const name = document.getElementById('nameInput').value.trim();
+            if (name) {
+                setCookie('userName', name, 1);
+                showWelcome();
+            }
+        }
+
+        function clearCookie() {
+            setCookie('userName', '', -1);
+            showWelcome();
+        }
+
+        function showWelcome() {
+            const name = getCookie('userName');
+            const welcome = document.getElementById('welcome');
+            const popup = document.getElementById('namePopup');
+            const clearButton = document.getElementById('clearButton');
+            
+            if (name) {
+                welcome.innerHTML = '<h2>Welcome back, ' + name + '!</h2>';
+                popup.style.display = 'none';
+                clearButton.style.display = 'block';
+            } else {
+                welcome.innerHTML = '';
+                popup.style.display = 'block';
+                clearButton.style.display = 'none';
+            }
+        }
+
+        // Show welcome message or popup on page load
+        showWelcome();
+    </script>
+</body>
+</html>
