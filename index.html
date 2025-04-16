@@ -1,12 +1,55 @@
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Cookie Demo</title>
-  </head>
-  <body>
-    <div id="app"></div>
-    <script type="module" src="/main.js"></script>
-  </body>
-</html>
+package com.example;
+
+import javax.servlet.ServletException;
+import javax.servlet.annotation.WebServlet;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
+
+@WebServlet("/cookie")
+public class CookieServlet extends HttpServlet {
+    @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        Cookie[] cookies = request.getCookies();
+        String username = null;
+        
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("username".equals(cookie.getName())) {
+                    username = cookie.getValue();
+                    break;
+                }
+            }
+        }
+
+        response.setContentType("text/html");
+        response.getWriter().println("<html><body>");
+        response.getWriter().println("<h2>Cookie Demo</h2>");
+        
+        if (username != null) {
+            response.getWriter().println("<p>Cookie value: " + username + "</p>");
+        } else {
+            response.getWriter().println("<p>No cookie found</p>");
+        }
+        
+        response.getWriter().println("<form action='cookie' method='post'>");
+        response.getWriter().println("<input type='submit' value='Create Cookie'>");
+        response.getWriter().println("</form>");
+        response.getWriter().println("</body></html>");
+    }
+
+    @Override
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) 
+            throws ServletException, IOException {
+        
+        Cookie cookie = new Cookie("username", "John Doe");
+        cookie.setMaxAge(7 * 24 * 60 * 60); // 7 days
+        response.addCookie(cookie);
+        
+        response.sendRedirect("cookie");
+    }
+}
